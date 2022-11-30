@@ -19,3 +19,18 @@ fun assertEquals(value: Any, target: Any) {
     if (value != target)
         check(false) { "Expected $target got $value" }
 }
+
+fun testDay(
+    day: Int,
+    testTarget: Int,
+    part1: (List<String>) -> Int,
+    part2: (List<String>) -> Int,
+) {
+    // test if implementation meets criteria from the description, like:
+    val testInput = readInput("Day${day.toString().padStart(2, '0')}_test")
+    assertEquals(part1(testInput), testTarget)
+
+    val input = readInput("Day${day.toString().padStart(2, '0')}")
+    println(part1(input))
+    println(part2(input))
+}
