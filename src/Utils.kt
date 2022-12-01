@@ -32,13 +32,17 @@ fun test(
     val testInput = readInput("Day${dayNumber}_test")
     val input = readInput("Day${dayNumber}")
 
-    println("Testing part 1 with target $testTarget1...")
-    assertEquals(part1(testInput), testTarget1)
-    println("Part 1")
-    println(part1(input))
+    println("[DAY $day]")
 
-    println("Testing part 2 with target $testTarget2...")
-    assertEquals(part2(testInput), testTarget2)
+    println("Part 1")
+    print("  test:   $testTarget1 ")
+    assertEquals(part1(testInput), testTarget1)
+    println("OK")
+    println("  answer: ${part1(input)}")
+
     println("Part 2")
-    println(part2(input))
+    print("  test:   $testTarget2 ")
+    assertEquals(part2(testInput), testTarget2)
+    println("OK")
+    println("  answer: ${part2(input)}")
 }
