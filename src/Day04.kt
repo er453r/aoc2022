@@ -8,7 +8,7 @@ fun main() {
     }
 
     test(
-        day = 0,
+        day = 4,
         testTarget1 = 6,
         testTarget2 = 6,
         part1 = ::part1,
