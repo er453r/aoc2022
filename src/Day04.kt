@@ -1,41 +1,21 @@
 fun main() {
     val inputLineRegex = """(\d+)-(\d+),(\d+)-(\d+)""".toRegex()
 
-    fun part1(input: List<String>): Int {
-        var sum = 0
+    fun lineToSets(line: String): Pair<Set<Int>, Set<Int>> {
+        val (start1, end1, start2, end2) = line.destructured(inputLineRegex)
 
-        for(line in input){
-            val (start1, end1, start2, end2) = inputLineRegex.matchEntire(line)
-                ?.destructured
-                ?: throw IllegalArgumentException("Incorrect input line $line")
-
-            val first = IntRange(start1.toInt(), end1.toInt()).toSet()
-            val second = IntRange(start2.toInt(), end2.toInt()).toSet()
-
-            if(first.containsAll(second) || second.containsAll(first))
-                sum += 1
-        }
-
-        return sum
+        return Pair(IntRange(start1.toInt(), end1.toInt()).toSet(), IntRange(start2.toInt(), end2.toInt()).toSet())
     }
 
-    fun part2(input: List<String>): Int {
-        var sum = 0
+    fun part1(input: List<String>): Int = input
+        .map(::lineToSets)
+        .map { (a, b) -> a.containsAll(b) || b.containsAll(a) }
+        .sumTrue()
 
-        for(line in input){
-            val (start1, end1, start2, end2) = inputLineRegex.matchEntire(line)
-                ?.destructured
-                ?: throw IllegalArgumentException("Incorrect input line $line")
-
-            val first = IntRange(start1.toInt(), end1.toInt()).toSet()
-            val second = IntRange(start2.toInt(), end2.toInt()).toSet()
-
-            if(first.intersect(second).isNotEmpty())
-                sum += 1
-        }
-
-        return sum
-    }
+    fun part2(input: List<String>): Int = input
+        .map(::lineToSets)
+        .map { (a, b) -> a.intersect(b).isNotEmpty() }
+        .sumTrue()
 
     test(
         day = 4,

@@ -20,6 +20,20 @@ fun assertEquals(value: Any, target: Any) {
         check(false) { "Expected $target got $value" }
 }
 
+fun Iterable<Boolean>.sumTrue(): Int {
+    var sum = 0
+
+    for (element in this)
+        if (element)
+            sum += 1
+
+    return sum
+}
+
+fun String.destructured(regex: Regex): MatchResult.Destructured = regex.matchEntire(this)
+    ?.destructured
+    ?: throw IllegalArgumentException("Incorrect line $this")
+
 fun test(
     day: Int,
     testTarget1: Int,
