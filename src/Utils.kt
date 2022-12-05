@@ -1,19 +1,7 @@
 import java.io.File
-import java.math.BigInteger
-import java.security.MessageDigest
 
-/**
- * Reads lines from the given input txt file.
- */
 fun readInput(name: String) = File("aoc2022/src", "$name.txt")
     .readLines()
-
-/**
- * Converts string to md5 hash.
- */
-fun String.md5() = BigInteger(1, MessageDigest.getInstance("MD5").digest(toByteArray()))
-    .toString(16)
-    .padStart(32, '0')
 
 fun assertEquals(value: Any, target: Any) {
     if (value != target)
@@ -36,10 +24,10 @@ fun String.destructured(regex: Regex): MatchResult.Destructured = regex.matchEnt
 
 fun test(
     day: Int,
-    testTarget1: Int,
-    testTarget2: Int,
-    part1: (List<String>) -> Int,
-    part2: (List<String>) -> Int,
+    testTarget1: Any,
+    testTarget2: Any,
+    part1: (List<String>) -> Any,
+    part2: (List<String>) -> Any,
 ) {
     // test if implementation meets criteria from the description, like:
     val dayNumber = day.toString().padStart(2, '0')
