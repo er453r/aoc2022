@@ -3,7 +3,7 @@ import java.io.File
 fun readInput(name: String) = File("aoc2022/src", "$name.txt")
     .readLines()
 
-fun assertEquals(value: Any, target: Any) {
+fun <T> assertEquals(value: T, target: T) {
     if (value != target)
         check(false) { "Expected $target got $value" }
 }
@@ -22,12 +22,12 @@ fun String.destructured(regex: Regex): MatchResult.Destructured = regex.matchEnt
     ?.destructured
     ?: throw IllegalArgumentException("Incorrect line $this")
 
-fun test(
+fun <T> test(
     day: Int,
-    testTarget1: Any,
-    testTarget2: Any,
-    part1: (List<String>) -> Any,
-    part2: (List<String>) -> Any,
+    testTarget1: T,
+    testTarget2: T,
+    part1: (List<String>) -> T,
+    part2: (List<String>) -> T,
 ) {
     // test if implementation meets criteria from the description, like:
     val dayNumber = day.toString().padStart(2, '0')
