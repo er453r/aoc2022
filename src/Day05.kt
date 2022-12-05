@@ -1,53 +1,41 @@
 fun main() {
     val inputLineRegex = """move (\d+) from (\d+) to (\d+)""".toRegex()
 
-    fun fillStacks(stacks: List<ArrayDeque<Char>>, line: String) {
-        stacks.forEachIndexed { index, chars ->
-            line.getOrNull(index * 4 + 1)?.takeIf { it.isLetter() }?.let {
-                chars.addLast(it)
-            }
-        }
-    }
-
-    fun part1(input: List<String>): String {
+    fun partX(input: List<String>, moveLogic: (List<ArrayDeque<Char>>, Int, Int, Int) -> Unit): String {
         val stacks = List(9) { ArrayDeque<Char>() }
 
         for (line in input) {
-            if (line.contains('['))
-                fillStacks(stacks, line)
+            if (line.contains('[')) {
+                stacks.forEachIndexed { index, chars ->
+                    line.getOrNull(index * 4 + 1)?.takeIf { it.isLetter() }?.let {
+                        chars.addLast(it)
+                    }
+                }
+            }
 
             if (line.contains("move")) {
                 val (count, from, to) = line.destructured(inputLineRegex)
 
-                for (i in 0 until count.toInt())
-                    stacks[to.toInt() - 1].addFirst(stacks[from.toInt() - 1].removeFirst())
+                moveLogic(stacks, count.toInt(), from.toInt(), to.toInt())
             }
         }
 
-        return stacks.map { if (it.isEmpty()) "" else it.first() }.joinToString(separator = "")
+        return stacks.filter { it.isNotEmpty() }.map { it.first() }.joinToString(separator = "")
     }
 
-    fun part2(input: List<String>): String {
-        val stacks = List(9) { ArrayDeque<Char>() }
+    fun part1(input: List<String>) = partX(input) { stacks, count, from, to ->
+        for (i in 0 until count)
+            stacks[to - 1].addFirst(stacks[from - 1].removeFirst())
+    }
 
-        for (line in input) {
-            if (line.contains('['))
-                fillStacks(stacks, line)
+    fun part2(input: List<String>) = partX(input) { stacks, count, from, to ->
+        val queue = ArrayDeque<Char>()
 
-            if (line.contains("move")) {
-                val (count, from, to) = line.destructured(inputLineRegex)
+        for (i in 0 until count)
+            queue.add(stacks[from - 1].removeFirst())
 
-                val queue = ArrayDeque<Char>()
-
-                for (i in 0 until count.toInt())
-                    queue.add(stacks[from.toInt() - 1].removeFirst())
-
-                while (queue.isNotEmpty())
-                    stacks[to.toInt() - 1].addFirst(queue.removeLast())
-            }
-        }
-
-        return stacks.map { if (it.isEmpty()) "" else it.first() }.joinToString(separator = "")
+        while (queue.isNotEmpty())
+            stacks[to - 1].addFirst(queue.removeLast())
     }
 
     test(
