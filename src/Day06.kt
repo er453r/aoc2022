@@ -1,37 +1,23 @@
 fun main() {
-    fun part1(input: List<String>): Int {
+    fun findUniqueSequence(haystack:String, sequenceLength:Int):Int{
         val queue = ArrayDeque<Char>()
-        val haystack = input.first()
 
-        for(i in 0 until haystack.length){
+        for(i in haystack.indices){
             queue.addLast(haystack[i])
 
-            if(queue.size > 4)
+            if(queue.size > sequenceLength)
                 queue.removeFirst()
 
-            if(queue.toSet().size == 4)
+            if(queue.toSet().size == sequenceLength)
                 return i + 1
         }
 
-        return 0
+        return -1
     }
 
-    fun part2(input: List<String>): Int {
-        val queue = ArrayDeque<Char>()
-        val haystack = input.first()
+    fun part1(input: List<String>) = findUniqueSequence(input.first(), 4)
 
-        for(i in 0 until haystack.length){
-            queue.addLast(haystack[i])
-
-            if(queue.size > 14)
-                queue.removeFirst()
-
-            if(queue.toSet().size == 14)
-                return i + 1
-        }
-
-        return 0
-    }
+    fun part2(input: List<String>) = findUniqueSequence(input.first(), 14)
 
     test(
         day = 6,
