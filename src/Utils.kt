@@ -38,3 +38,32 @@ fun <T> test(
     println("OK")
     println("  answer: ${part2(input)}")
 }
+
+class IntGrid(input: List<String>){
+    val grid = input.map { it.toCharArray().map { char -> char.digitToInt() } }
+    val width = grid.first().size
+    val height = grid.size
+
+    fun get(x:Int, y:Int) = grid[y][x]
+    operator fun get(vector2d: Vector2d) = get(vector2d.x, vector2d.y)
+
+    fun contains(x:Int, y:Int) = x >= 0 && x < width && y >= 0 && y < height
+
+    operator fun contains(vector2d: Vector2d) = contains(vector2d.x, vector2d.y)
+}
+
+data class Vector2d(var x: Int = 0, var y: Int = 0){
+    operator fun plus(vector2d: Vector2d) = Vector2d(x + vector2d.x, y + vector2d.y)
+
+    fun increment(dx: Int, dy:Int){
+        x += dx
+        y += dy
+    }
+}
+
+enum class Direction2d(val vector2d: Vector2d) {
+    RIGHT(Vector2d(1, 0)),
+    DOWN(Vector2d(0, 1)),
+    UP(Vector2d(0, -1)),
+    LEFT(Vector2d(-1, 0)),
+}
