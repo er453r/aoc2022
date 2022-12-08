@@ -39,8 +39,17 @@ fun <T> test(
     println("  answer: ${part2(input)}")
 }
 
-class IntGrid(input: List<String>){
-    val grid = input.map { it.toCharArray().map { char -> char.digitToInt() } }
+
+class GridCell<T>(
+    val value: T,
+    val position:Vector2d,
+)
+
+class Grid<T>(data: List<List<T>>){
+    private val grid = data.mapIndexed { y, line ->
+        line.mapIndexed { x, value -> GridCell(value, Vector2d(x, y)) }
+    }
+
     val width = grid.first().size
     val height = grid.size
 
@@ -53,17 +62,13 @@ class IntGrid(input: List<String>){
 }
 
 data class Vector2d(var x: Int = 0, var y: Int = 0){
-    operator fun plus(vector2d: Vector2d) = Vector2d(x + vector2d.x, y + vector2d.y)
-
-    fun increment(dx: Int, dy:Int){
-        x += dx
-        y += dy
+    companion object{
+        val UP = Vector2d(0, -1)
+        val DOWN = Vector2d(0, 1)
+        val LEFT = Vector2d(-1, -0)
+        val RIGHT = Vector2d(1, 0)
+        val DIRECTIONS = arrayOf(UP, DOWN, LEFT, RIGHT)
     }
-}
 
-enum class Direction2d(val vector2d: Vector2d) {
-    RIGHT(Vector2d(1, 0)),
-    DOWN(Vector2d(0, 1)),
-    UP(Vector2d(0, -1)),
-    LEFT(Vector2d(-1, 0)),
+    operator fun plus(vector2d: Vector2d) = Vector2d(x + vector2d.x, y + vector2d.y)
 }
