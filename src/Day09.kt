@@ -18,13 +18,11 @@ fun main() {
                 for (n in 1 until knots.size) {
                     val diff = knots[n - 1] - knots[n]
 
-                    if (diff.length() > 1) { // we need to move
+                    if (diff.length() > 1) // we need to move
                         knots[n] += diff.normalized()
-
-                        if (n == knots.size - 1)
-                            visited.add(knots[n])
-                    }
                 }
+
+                visited.add(knots.last())
             }
         }
 
