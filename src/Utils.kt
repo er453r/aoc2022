@@ -70,5 +70,8 @@ data class Vector2d(var x: Int = 0, var y: Int = 0){
         val DIRECTIONS = arrayOf(UP, DOWN, LEFT, RIGHT)
     }
 
+    override fun toString() = "$x-$y"
+
     operator fun plus(vector2d: Vector2d) = Vector2d(x + vector2d.x, y + vector2d.y)
+    operator fun minus(vector2d: Vector2d) = Vector2d(x - vector2d.x, y - vector2d.y)
 }
