@@ -1,4 +1,6 @@
 import java.io.File
+import kotlin.math.abs
+import kotlin.math.max
 
 fun readInput(name: String) = File("aoc2022/src", "$name.txt")
     .readLines()
@@ -42,10 +44,10 @@ fun <T> test(
 
 class GridCell<T>(
     val value: T,
-    val position:Vector2d,
+    val position: Vector2d,
 )
 
-class Grid<T>(data: List<List<T>>){
+class Grid<T>(data: List<List<T>>) {
     private val grid = data.mapIndexed { y, line ->
         line.mapIndexed { x, value -> GridCell(value, Vector2d(x, y)) }
     }
@@ -53,16 +55,16 @@ class Grid<T>(data: List<List<T>>){
     val width = grid.first().size
     val height = grid.size
 
-    fun get(x:Int, y:Int) = grid[y][x]
+    fun get(x: Int, y: Int) = grid[y][x]
     operator fun get(vector2d: Vector2d) = get(vector2d.x, vector2d.y)
 
-    fun contains(x:Int, y:Int) = x >= 0 && x < width && y >= 0 && y < height
+    fun contains(x: Int, y: Int) = x >= 0 && x < width && y >= 0 && y < height
 
     operator fun contains(vector2d: Vector2d) = contains(vector2d.x, vector2d.y)
 }
 
-data class Vector2d(var x: Int = 0, var y: Int = 0){
-    companion object{
+data class Vector2d(var x: Int = 0, var y: Int = 0) {
+    companion object {
         val UP = Vector2d(0, -1)
         val DOWN = Vector2d(0, 1)
         val LEFT = Vector2d(-1, -0)
@@ -70,8 +72,10 @@ data class Vector2d(var x: Int = 0, var y: Int = 0){
         val DIRECTIONS = arrayOf(UP, DOWN, LEFT, RIGHT)
     }
 
-    override fun toString() = "$x-$y"
-
     operator fun plus(vector2d: Vector2d) = Vector2d(x + vector2d.x, y + vector2d.y)
     operator fun minus(vector2d: Vector2d) = Vector2d(x - vector2d.x, y - vector2d.y)
+
+    fun normalized() = Vector2d(if (x != 0) x / abs(x) else 0, if (y != 0) y / abs(y) else 0)
+
+    fun length() = max(abs(x), abs(y))
 }
