@@ -1,53 +1,35 @@
 fun main() {
-    fun drawPixel(cycle:Int, x:Int, width:Int){
-//        println("$cycle $x ${cycle % 40} in ${(x .. x+3)} = ${cycle % 40 in (x .. x+3)}")
-
-        if(cycle % 40 in (x until x+3))
-            print("#")
-        else
-            print(" ")
-
-        if(cycle % 5 == 0)
-            print("    ")
+    fun drawPixel(cycle:Int, x:Int){
+        print(if((cycle - 1) % 40 + 1 in (x until x+3)) "#" else " ")
 
         if(cycle % 40 == 0)
             println()
+    }
+
+    fun cycle(x:Int, currentCycle:Int, targetCycles:Array<Int>, mapOfTargets:MutableMap<Int, Int>){
+        if(currentCycle in targetCycles)
+            mapOfTargets[currentCycle] = x
+
+        drawPixel(currentCycle, x)
     }
 
     fun part1(input: List<String>): Int {
         var currentCycle = 0
         var x = 1
 
-        var targetCycles = arrayOf(20, 60, 100, 140, 180, 220)
-        var mapOfTargets = mutableMapOf<Int, Int>()
-
-        val width = 40
+        val targetCycles = arrayOf(20, 60, 100, 140, 180, 220)
+        val mapOfTargets = mutableMapOf<Int, Int>()
 
         println()
 
         for(line in input){
-            currentCycle += 1 // start fo cycle
+            cycle(x, ++currentCycle, targetCycles, mapOfTargets)
 
-            if(currentCycle in targetCycles)
-                mapOfTargets[currentCycle] = x
-
-            drawPixel(currentCycle, x, width)
-
-            if(line == "noop"){
-                // do nothing
-            }
-            else if(line.startsWith("addx")){
-                currentCycle += 1 // end cycle, start new
-
-                if(currentCycle in targetCycles)
-                    mapOfTargets[currentCycle] = x
-
-                drawPixel(currentCycle, x, width)
+            if(line.startsWith("addx")){
+                cycle(x, ++currentCycle, targetCycles, mapOfTargets)
 
                 x += line.split(" ").last().toInt()
             }
-            else
-                throw Exception("Unknown command $line")
         }
 
         return mapOfTargets.entries.sumOf { it.key * it.value }
