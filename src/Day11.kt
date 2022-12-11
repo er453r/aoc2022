@@ -34,13 +34,11 @@ fun main() {
 
         repeat(rounds) {
             monkeys.forEach { monkey ->
+                inspections[monkey.id] = inspections[monkey.id]!! + monkey.items.size
+
                 while (monkey.items.isNotEmpty()) {
                     val worryLevel = monkey.items.removeFirst()
-
-                    inspections[monkey.id] = inspections[monkey.id]!! + 1
-
                     val operationParameter: Long = if (monkey.operationParam == "old") worryLevel else monkey.operationParam.toLong()
-
                     val newWorryLevel = when (monkey.operation) {
                         '*' -> worryLevel * operationParameter
                         '+' -> worryLevel + operationParameter
