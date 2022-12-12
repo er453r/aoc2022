@@ -43,24 +43,26 @@ fun <T> test(
 
 
 class GridCell<T>(
-    val value: T,
+    var value: T,
     val position: Vector2d,
 )
 
 class Grid<T>(data: List<List<T>>) {
-    private val grid = data.mapIndexed { y, line ->
+    val data = data.mapIndexed { y, line ->
         line.mapIndexed { x, value -> GridCell(value, Vector2d(x, y)) }
     }
 
-    val width = grid.first().size
-    val height = grid.size
+    val width = data.first().size
+    val height = data.size
 
-    fun get(x: Int, y: Int) = grid[y][x]
+    fun get(x: Int, y: Int) = data[y][x]
     operator fun get(vector2d: Vector2d) = get(vector2d.x, vector2d.y)
 
     fun contains(x: Int, y: Int) = x >= 0 && x < width && y >= 0 && y < height
 
     operator fun contains(vector2d: Vector2d) = contains(vector2d.x, vector2d.y)
+
+    fun crossNeighbours(vector2d: Vector2d) = Vector2d.DIRECTIONS.map { vector2d + it }.filter { contains(it) }.map { get(it) }
 }
 
 data class Vector2d(var x: Int = 0, var y: Int = 0) {
