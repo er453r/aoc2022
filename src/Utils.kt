@@ -58,11 +58,22 @@ class Grid<T>(data: List<List<T>>) {
     fun get(x: Int, y: Int) = data[y][x]
     operator fun get(vector2d: Vector2d) = get(vector2d.x, vector2d.y)
 
-    fun contains(x: Int, y: Int) = x >= 0 && x < width && y >= 0 && y < height
+    fun contains(x: Int, y: Int) = (x in 0 until width) && (y in 0 until height)
 
     operator fun contains(vector2d: Vector2d) = contains(vector2d.x, vector2d.y)
 
     fun crossNeighbours(vector2d: Vector2d) = Vector2d.DIRECTIONS.map { vector2d + it }.filter { contains(it) }.map { get(it) }
+
+    fun path(
+        start: GridCell<T>,
+        end: GridCell<T>,
+        heuristic: (GridCell<T>) -> Int = {
+            (end.position - it.position).length()
+        },
+        neighbours: (GridCell<T>) -> Collection<GridCell<T>> = {
+            crossNeighbours(it.position)
+        },
+    ) = aStar(start, end, heuristic, neighbours)
 }
 
 data class Vector2d(var x: Int = 0, var y: Int = 0) {
@@ -80,4 +91,52 @@ data class Vector2d(var x: Int = 0, var y: Int = 0) {
     fun normalized() = Vector2d(if (x != 0) x / abs(x) else 0, if (y != 0) y / abs(y) else 0)
 
     fun length() = max(abs(x), abs(y))
+}
+
+fun <Node> aStar(
+    start: Node,
+    end: Node,
+    heuristic: (Node) -> Int,
+    neighbours: (Node) -> Collection<Node>,
+): List<Node> {
+    val openSet = mutableSetOf(start)
+    val gScores = mutableMapOf(start to 0)
+    val fScores = mutableMapOf(start to heuristic(start))
+    val cameFrom = mutableMapOf<Node, Node>()
+
+    fun reconstructPath(cameFrom: Map<Node, Node>, end: Node): List<Node> {
+        val path = mutableListOf(end)
+        var current = end
+
+        while (current in cameFrom) {
+            current = cameFrom[current]!!
+            path.add(current)
+        }
+
+        return path
+    }
+
+    while (openSet.isNotEmpty()) {
+        val current = openSet.minBy { fScores[it]!! }
+
+        if (current == end)
+            return reconstructPath(cameFrom, current)
+
+        openSet.remove(current)
+
+        for (neighbour in neighbours(current)) {
+            val neighbourScore = gScores[current]!! + 1
+
+            if (neighbourScore < gScores.getOrDefault(neighbour, 999999)) {
+                cameFrom[neighbour] = current
+                gScores[neighbour] = neighbourScore
+                fScores[neighbour] = neighbourScore + heuristic(neighbour)
+
+                if (neighbour !in openSet)
+                    openSet += neighbour
+            }
+        }
+    }
+
+    return emptyList()
 }

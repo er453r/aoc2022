@@ -1,78 +1,27 @@
 fun main() {
     val aCode = 'a'.code
-    val startCode = 'S'.code - aCode
-    val endCode = 'E'.code - aCode
+    val (startCode, endCode) = arrayOf('S'.code - aCode, 'E'.code - aCode)
 
-    fun findPathLength(start:GridCell<Int>, end:GridCell<Int>, grid:Grid<Int>):Int{
-        fun h(cell: GridCell<Int>): Int = (end.position - cell.position).length()
-
-        val openSet = mutableSetOf(start)
-        val gScores = mutableMapOf(start to 0)
-        val fScores = mutableMapOf(start to h(start))
-        val cameFrom = mutableMapOf<GridCell<Int>, GridCell<Int>>()
-
-        fun reconstructPath(cameFrom: Map<GridCell<Int>, GridCell<Int>>, end: GridCell<Int>): List<GridCell<Int>> {
-            val path = mutableListOf(end)
-            var current = end
-
-            while (current in cameFrom) {
-                current = cameFrom[current]!!
-                path.add(current)
-            }
-
-            return path
-        }
-
-        while (openSet.isNotEmpty()) {
-            val current = openSet.minBy { fScores[it]!! }
-
-            if (current == end)
-                return reconstructPath(cameFrom, current).size - 1
-
-            openSet.remove(current)
-
-            val neighbours = grid.crossNeighbours(current.position).filter {
-                it.value < current.value + 2
-            }
-
-            for (neighbour in neighbours) {
-                val neighbourScore = gScores[current]!! + 1
-
-                if (neighbourScore < gScores.getOrDefault(neighbour, 999999)) {
-                    cameFrom[neighbour] = current
-                    gScores[neighbour] = neighbourScore
-                    fScores[neighbour] = neighbourScore + h(neighbour)
-
-                    if (neighbour !in openSet)
-                        openSet += neighbour
-                }
-
-            }
-        }
-
-        return -1
+    fun neighbours(cell: GridCell<Int>, grid: Grid<Int>) = grid.crossNeighbours(cell.position).filter {
+        it.value < cell.value + 2
     }
 
-    fun part1(input: List<String>): Int {
-        val grid = Grid(input.map { it.toCharArray().asList().map { it.code - aCode } })
+    fun prepareData(input: List<String>): Triple<Grid<Int>, GridCell<Int>, GridCell<Int>> {
+        val grid = Grid(input.map { it.toCharArray().asList().map { char -> char.code - aCode } })
+        val start = grid.data.flatten().first { it.value == startCode }.also { it.value = 0 }
+        val end = grid.data.flatten().first { it.value == endCode }.also { it.value = 26 }
 
-        val start = grid.data.flatten().first { it.value == startCode }
-        val end = grid.data.flatten().first { it.value == endCode }
-        start.value = 0
-        end.value = 26
-
-        return findPathLength(start, end, grid)
+        return Triple(grid, start, end)
     }
 
-    fun part2(input: List<String>): Int {
-        val grid = Grid(input.map { it.toCharArray().asList().map { it.code - aCode } })
+    fun part1(input: List<String>) = prepareData(input).let { (grid, start, end) ->
+        grid.path(start, end, neighbours = { neighbours(it, grid) }).size - 1
+    }
 
-        val start = grid.data.flatten().first { it.value == startCode }
-        val end = grid.data.flatten().first { it.value == endCode }
-        start.value = 0
-        end.value = 26
-
-        return grid.data.flatten().filter { it.value == 0 }.map { findPathLength(it, end, grid) }.filter { it != -1 }.min()
+    fun part2(input: List<String>) = prepareData(input).let { (grid, _, end) ->
+        grid.data.asSequence().flatten().filter { it.value == 0 }.map { cell ->
+            grid.path(cell, end, neighbours = { neighbours(it, grid) })
+        }.filter { it.isNotEmpty() }.minOf { it.size - 1 }
     }
 
     test(
