@@ -14,6 +14,10 @@ fun String.destructured(regex: Regex): MatchResult.Destructured = regex.matchEnt
     ?.destructured
     ?: throw IllegalArgumentException("Incorrect line $this")
 
+val intLineRegex = """\d+""".toRegex()
+
+fun String.ints() = intLineRegex.findAll(this).map { it.value.toInt() }
+
 fun <T> test(
     day: Int,
     testTarget1: T,
