@@ -14,9 +14,9 @@ fun String.destructured(regex: Regex): MatchResult.Destructured = regex.matchEnt
     ?.destructured
     ?: throw IllegalArgumentException("Incorrect line $this")
 
-val intLineRegex = """\d+""".toRegex()
+val intLineRegex = """-?\d+""".toRegex()
 
-fun String.ints() = intLineRegex.findAll(this).map { it.value.toInt() }
+fun String.ints() = intLineRegex.findAll(this).map { it.value.toInt() }.toList()
 
 fun <T> test(
     day: Int,
@@ -95,6 +95,8 @@ data class Vector2d(var x: Int = 0, var y: Int = 0) {
     fun normalized() = Vector2d(if (x != 0) x / abs(x) else 0, if (y != 0) y / abs(y) else 0)
 
     fun length() = max(abs(x), abs(y))
+
+    fun manhattan() =  abs(x) + abs(y)
 }
 
 fun <Node> aStar(
