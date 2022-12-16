@@ -146,3 +146,5 @@ fun <Node> aStar(
 
     return emptyList()
 }
+
+fun Int.factorial() = (1L..this).reduce(Long::times)
