@@ -92,7 +92,16 @@ data class Vector2d(var x: Int = 0, var y: Int = 0) {
     operator fun plus(vector2d: Vector2d) = Vector2d(x + vector2d.x, y + vector2d.y)
     operator fun minus(vector2d: Vector2d) = Vector2d(x - vector2d.x, y - vector2d.y)
 
+    fun increment(vector2d: Vector2d):Vector2d{
+        this.x += vector2d.x
+        this.y += vector2d.y
+
+        return this
+    }
+
     fun normalized() = Vector2d(if (x != 0) x / abs(x) else 0, if (y != 0) y / abs(y) else 0)
+
+    fun negative() = Vector2d(-x, -y)
 
     fun length() = max(abs(x), abs(y))
 
@@ -147,4 +156,56 @@ fun <Node> aStar(
     return emptyList()
 }
 
+fun List<String>.separateByBlank():List<List<String>>{
+    val result = mutableListOf<List<String>>()
+    var currentList = mutableListOf<String>()
+
+    for(line in this)
+        when{
+            line.isBlank() && currentList.isEmpty() -> continue
+            line.isBlank() -> {
+                result.add(currentList)
+                currentList = mutableListOf()
+            }
+            else -> currentList.add(line)
+        }
+
+    if(currentList.isNotEmpty())
+        result.add(currentList)
+
+    return result
+}
+
 fun Int.factorial() = (1L..this).reduce(Long::times)
+
+fun List<Int>.findSequence():Pair<Int, Int>{
+    var sequences = mutableListOf<Pair<Int, Int>>()
+
+    // for every position in the array:
+    for (startPos in 0 until this.size) {
+        // check if there is a repeating sequence here:
+
+        // check every sequence length which is lower or equal to half the
+        // remaining array length: (this is important, otherwise we'll go out of bounds)
+        for (sequenceLength in 1..(this.size - startPos) / 2) {
+
+            // check if the sequences of length sequenceLength which start
+            // at startPos and (startPos + sequenceLength (the one
+            // immediately following it)) are equal:
+            var sequencesAreEqual = true
+            for (i in 0 until sequenceLength) {
+                if (this[startPos + i] != this[startPos + sequenceLength + i]) {
+                    sequencesAreEqual = false
+                    break
+                }
+            }
+            if (sequencesAreEqual) {
+//                println("Found repeating sequence at pos $startPos of length $sequenceLength")
+
+                sequences += Pair(startPos, sequenceLength)
+            }
+        }
+    }
+
+    return sequences.maxBy { it.second }
+}
