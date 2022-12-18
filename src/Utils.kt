@@ -108,6 +108,29 @@ data class Vector2d(var x: Int = 0, var y: Int = 0) {
     fun manhattan() =  abs(x) + abs(y)
 }
 
+data class Vector3d(var x: Int = 0, var y: Int = 0, var z:Int = 0) {
+    companion object {
+        val UP = Vector3d(0, -1, 0)
+        val DOWN = Vector3d(0, 1 , 0)
+        val LEFT = Vector3d(-1, 0, 0)
+        val RIGHT = Vector3d(1, 0, 0)
+        val FORWARD = Vector3d(0, 0, -1)
+        val BACKWARD = Vector3d(0, 0, 1)
+        val DIRECTIONS = arrayOf(UP, DOWN, LEFT, RIGHT, FORWARD, BACKWARD)
+    }
+
+    operator fun plus(vector3d: Vector3d) = Vector3d(x + vector3d.x, y + vector3d.y, z + vector3d.z)
+    operator fun minus(vector3d: Vector3d) = Vector3d(x - vector3d.x, y - vector3d.y, z - vector3d.z)
+
+    fun increment(vector3d: Vector3d):Vector3d{
+        this.x += vector3d.x
+        this.y += vector3d.y
+        this.z += vector3d.z
+
+        return this
+    }
+}
+
 fun <Node> aStar(
     start: Node,
     end: Node,
