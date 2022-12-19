@@ -1,82 +1,48 @@
 fun main() {
     fun part1(input: List<String>): Int {
-        val occuppied = input.map { it.ints() }.map { (x, y, z) -> Vector3d(x, y, z) }.toSet()
+        val occupied = input.map { it.ints() }.map { (x, y, z) -> Vector3d(x, y, z) }.toSet()
 
-        var totalArea = 0
-
-        for (cube in occuppied) {
-            var cubeArea = 6
-
-            for (direction in Vector3d.DIRECTIONS)
-                if (cube + direction in occuppied)
-                    cubeArea--
-
-            totalArea += cubeArea
-        }
-
-        return totalArea
+        return occupied.sumOf { cube -> 6 - Vector3d.DIRECTIONS.count { dir -> cube + dir in occupied } }
     }
 
     fun part2(input: List<String>): Int {
-        var occuppied = input.map { it.ints() }.map { (x, y, z) -> Vector3d(x, y, z) }.toMutableSet()
+        val occupied = input.map { it.ints() }.map { (x, y, z) -> Vector3d(x, y, z) }.toMutableSet()
 
-        var totalArea = 0
-
-        val minX = occuppied.minOf { it.x } - 1
-        val minY = occuppied.minOf { it.y } - 1
-        val minZ = occuppied.minOf { it.z } - 1
-        val maxX = occuppied.maxOf { it.x } + 1
-        val maxY = occuppied.maxOf { it.y } + 1
-        val maxZ = occuppied.maxOf { it.z } + 1
+        val minX = occupied.minOf { it.x } - 1
+        val minY = occupied.minOf { it.y } - 1
+        val minZ = occupied.minOf { it.z } - 1
+        val maxX = occupied.maxOf { it.x } + 1
+        val maxY = occupied.maxOf { it.y } + 1
+        val maxZ = occupied.maxOf { it.z } + 1
 
         val xRange = minX..maxX
         val yRange = minY..maxY
         val zRange = minZ..maxZ
 
-        val all = mutableSetOf<Vector3d>()
-
-        for (x in xRange)
-            for (y in yRange)
-                for (z in zRange)
-                    all += Vector3d(x, y, z)
-
-        println("ALL ${all.size}")
-
+        val all = xRange.map { x -> yRange.map { y -> zRange.map { z -> Vector3d(x, y, z) } } }.flatten().flatten().toSet()
         val airOutside = mutableSetOf<Vector3d>()
         val visitQueue = mutableListOf(Vector3d(minX, minY, minZ))
 
-        while (visitQueue.isNotEmpty()) {
+        while (visitQueue.isNotEmpty()) { // fill the outside with air!
             val candidate = visitQueue.removeLast()
 
             airOutside += candidate
 
-            for (direction in Vector3d.DIRECTIONS){
+            for (direction in Vector3d.DIRECTIONS) {
                 val next = candidate + direction
 
-                if(next in airOutside || next in occuppied || next.x !in xRange || next.y !in yRange || next.z !in zRange)
+                if (next in airOutside || next in occupied || next.x !in xRange || next.y !in yRange || next.z !in zRange)
                     continue
 
                 visitQueue += next
             }
         }
 
-        val airPockets = all - airOutside - occuppied
+        val airPockets = all - airOutside - occupied
 
-        println("Air pockets $airPockets")
+        occupied += airPockets
 
-        occuppied += airPockets
-
-        for (cube in occuppied) {
-            var cubeArea = 6
-
-            for (direction in Vector3d.DIRECTIONS)
-                if (cube + direction in occuppied)
-                    cubeArea--
-
-            totalArea += cubeArea
-        }
-
-        return totalArea
+        return occupied.sumOf { cube -> 6 - Vector3d.DIRECTIONS.count { dir -> cube + dir in occupied } }
     }
 
     test(
