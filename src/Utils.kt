@@ -201,32 +201,21 @@ fun List<String>.separateByBlank():List<List<String>>{
 
 fun Int.factorial() = (1L..this).reduce(Long::times)
 
-fun List<Int>.findSequence():Pair<Int, Int>{
-    var sequences = mutableListOf<Pair<Int, Int>>()
+fun <T> List<T>.findLongestSequence():Pair<Int, Int>{
+    val sequences = mutableListOf<Pair<Int, Int>>()
 
-    // for every position in the array:
-    for (startPos in 0 until this.size) {
-        // check if there is a repeating sequence here:
-
-        // check every sequence length which is lower or equal to half the
-        // remaining array length: (this is important, otherwise we'll go out of bounds)
+    for (startPos in indices) {
         for (sequenceLength in 1..(this.size - startPos) / 2) {
-
-            // check if the sequences of length sequenceLength which start
-            // at startPos and (startPos + sequenceLength (the one
-            // immediately following it)) are equal:
             var sequencesAreEqual = true
-            for (i in 0 until sequenceLength) {
+
+            for (i in 0 until sequenceLength)
                 if (this[startPos + i] != this[startPos + sequenceLength + i]) {
                     sequencesAreEqual = false
                     break
                 }
-            }
-            if (sequencesAreEqual) {
-//                println("Found repeating sequence at pos $startPos of length $sequenceLength")
 
+            if (sequencesAreEqual)
                 sequences += Pair(startPos, sequenceLength)
-            }
         }
     }
 

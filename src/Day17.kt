@@ -20,17 +20,9 @@ fun main() {
 ##"""
 
     class Block(val points: List<Vector2d>) {
-        fun move(vector2d: Vector2d) {
-            points.forEach { it.increment(vector2d) }
-        }
+        fun move(vector2d: Vector2d) = points.forEach { it.increment(vector2d) }
 
-        fun collides(other: Set<Vector2d>): Boolean {
-            for (point in points)
-                if (point in other)
-                    return true
-
-            return false
-        }
+        fun collides(other: Set<Vector2d>) = points.any { it in other }
 
         fun copy(): Block = Block(points.map { it.copy() })
     }
@@ -47,23 +39,16 @@ fun main() {
         .map { Block(it) }
         .toList()
 
-    fun part1(input: List<String>): Long {
-        val moves = input.first().toCharArray().map {
-            when (it) {
-                '<' -> Vector2d.LEFT
-                else -> Vector2d.RIGHT
-            }
-        }
-
+    fun tetris(input: List<String>, blocksToFall: Int): Pair<Long, List<Int>> {
+        val moves = input.first().toCharArray().map { if (it == '<') Vector2d.LEFT else Vector2d.RIGHT }
         val rightWall = 8
+        val settled = mutableSetOf<Vector2d>()
+        val increments = mutableListOf<Int>()
 
         var currentTop = 0L
         var currentBlockIndex = 0
         var currentMoveIndex = 0
-
-        val settled = mutableSetOf<Vector2d>()
-
-        var rocksFallen = 2022
+        var rocksFallen = blocksToFall
 
         while (rocksFallen-- != 0) {
             val block = blocks[currentBlockIndex++ % blocks.size].copy()
@@ -86,61 +71,8 @@ fun main() {
                 if (block.collides(settled) || block.points.minOf { it.y } == 0) { // block settles
                     block.move(Vector2d.UP) // move back
                     settled.addAll(block.points)
-                    currentTop = min(currentTop, block.points.minOf { it.y }.toLong())
-
-                    break
-                }
-            }
-        }
-
-        return -currentTop
-    }
-
-    fun part2(input: List<String>): Long {
-        val moves = input.first().toCharArray().map {
-            when (it) {
-                '<' -> Vector2d.LEFT
-                else -> Vector2d.RIGHT
-            }
-        }
-
-        val rightWall = 8
-
-        var currentTop = 0L
-        var currentBlockIndex = 0
-        var currentMoveIndex = 0
-
-        val settled = mutableSetOf<Vector2d>()
-
-        var rocksFallen = 8022L
-
-        val derp = mutableListOf<Int>()
-
-        while (rocksFallen-- != 0L) {
-            val block = blocks[currentBlockIndex++ % blocks.size].copy()
-
-            block.move(Vector2d(3, currentTop.toInt() - 3)) // move to start position
-
-            while (true) {
-                val wind = moves[currentMoveIndex++ % moves.size] // first wind movement
-
-                block.move(wind)
-
-                if (block.collides(settled) ||
-                    block.points.minOf { it.x } == 0 ||
-                    block.points.maxOf { it.x } == rightWall
-                )
-                    block.move(wind.negative()) // move back
-
-                block.move(Vector2d.DOWN)
-
-                if (block.collides(settled) || block.points.minOf { it.y } == 0) { // block settles
-                    block.move(Vector2d.UP) // move back
-                    settled.addAll(block.points)
                     val newCurrentTop = min(currentTop, block.points.minOf { it.y }.toLong())
-                    val dc = (currentTop - newCurrentTop).toInt()
-                    derp.add(dc)
-//                    println(dc)
+                    increments.add((currentTop - newCurrentTop).toInt())
                     currentTop = newCurrentTop
 
                     break
@@ -148,28 +80,24 @@ fun main() {
             }
         }
 
-        val bestSequence = derp.findSequence()
+        return Pair(-currentTop, increments)
+    }
 
-//        println("bestSequence $bestSequence")
+    fun part1(input: List<String>) = tetris(input, 2022).first
 
+    fun part2(input: List<String>): Long {
+        val (_, increments) = tetris(input, 8000)
+        val bestSequence = increments.findLongestSequence()
         val iters = 1000000000000L
-        var height = 0L
-        var itersLeft = iters
+        val sequenceHeight = increments.subList(bestSequence.first, bestSequence.first + bestSequence.second).sum()
 
-        height += derp.subList(0, bestSequence.first).sum()
-        itersLeft -= bestSequence.first
-
-        val sequenceHeight = derp.subList(bestSequence.first, bestSequence.first + bestSequence.second).sum()
+        var height = increments.subList(0, bestSequence.first).sum().toLong()
+        var itersLeft = iters - bestSequence.first
         val sequencesLeft = itersLeft / bestSequence.second
 
         height += sequencesLeft * sequenceHeight
         itersLeft -= sequencesLeft * bestSequence.second
-
-        height += derp.subList(bestSequence.first, bestSequence.first + itersLeft.toInt()).sum()
-
-        val test = bestSequence.first + sequencesLeft * bestSequence.second + itersLeft
-
-//        println("iters verifcation ${iters - test}")
+        height += increments.subList(bestSequence.first, bestSequence.first + itersLeft.toInt()).sum()
 
         return height
     }
