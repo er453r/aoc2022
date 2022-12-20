@@ -131,6 +131,24 @@ data class Vector3d(var x: Int = 0, var y: Int = 0, var z:Int = 0) {
     }
 }
 
+class VectorN(val components: MutableList<Int>) {
+    constructor(vararg ints:Int) : this(ints.toMutableList())
+
+    operator fun plus(vectorN: VectorN) = VectorN(components.mapIndexed { index, it -> it + vectorN.components[index] }.toMutableList())
+    operator fun minus(vectorN: VectorN) = VectorN(components.mapIndexed { index, it -> it - vectorN.components[index] }.toMutableList())
+
+    fun increment(vectorN: VectorN):VectorN{
+        for(n in components.indices)
+            components[n] += vectorN.components[n]
+
+        return this
+    }
+
+    override fun toString(): String {
+        return components.toString()
+    }
+}
+
 fun <Node> aStar(
     start: Node,
     end: Node,
