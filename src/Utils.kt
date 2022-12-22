@@ -115,7 +115,9 @@ data class Vector3d(var x: Int = 0, var y: Int = 0, var z:Int = 0) {
         val LEFT = Vector3d(-1, 0, 0)
         val RIGHT = Vector3d(1, 0, 0)
         val FORWARD = Vector3d(0, 0, -1)
+        val FRONT = Vector3d(0, 0, -1)
         val BACKWARD = Vector3d(0, 0, 1)
+        val BACK = Vector3d(0, 0, 1)
         val DIRECTIONS = arrayOf(UP, DOWN, LEFT, RIGHT, FORWARD, BACKWARD)
     }
 
@@ -238,4 +240,9 @@ fun <T> List<T>.findLongestSequence():Pair<Int, Int>{
     }
 
     return sequences.maxBy { it.second }
+}
+
+fun gcd(a: Int, b: Int): Int {
+    if (b == 0) return a
+    return gcd(b, a % b)
 }
