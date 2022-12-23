@@ -33,7 +33,7 @@ fun main() {
 
             // first half
             for (elf in elves) {
-                val neighbours = elves.intersect(elf.neighbours8())
+                val neighbours = elf.neighbours8().intersect(elves)
 
                 if (neighbours.isEmpty())
                     continue

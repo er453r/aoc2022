@@ -34,15 +34,19 @@ fun <T> test(
 
     println("Part 1")
     print("  test:   $testTarget1 ")
+    var startTime = System.currentTimeMillis()
     assertEquals(part1(testInput), testTarget1)
-    println("OK")
-    println("  answer: ${part1(input)}")
+    println("OK (${System.currentTimeMillis() - startTime} ms)")
+    startTime = System.currentTimeMillis()
+    println("  answer: ${part1(input)} (${System.currentTimeMillis() - startTime} ms)")
 
     println("Part 2")
     print("  test:   $testTarget2 ")
+    startTime = System.currentTimeMillis()
     assertEquals(part2(testInput), testTarget2)
-    println("OK")
-    println("  answer: ${part2(input)}")
+    println("OK (${System.currentTimeMillis() - startTime} ms)")
+    startTime = System.currentTimeMillis()
+    println("  answer: ${part2(input)} (${System.currentTimeMillis() - startTime} ms)")
 }
 
 
