@@ -106,6 +106,17 @@ data class Vector2d(var x: Int = 0, var y: Int = 0) {
     fun length() = max(abs(x), abs(y))
 
     fun manhattan() =  abs(x) + abs(y)
+
+    fun neighbours8() = setOf(
+        this + UP,
+        this + UP + LEFT,
+        this + UP + RIGHT,
+        this + LEFT,
+        this + RIGHT,
+        this + DOWN,
+        this + DOWN + LEFT,
+        this + DOWN + RIGHT,
+    )
 }
 
 data class Vector3d(var x: Int = 0, var y: Int = 0, var z:Int = 0) {
