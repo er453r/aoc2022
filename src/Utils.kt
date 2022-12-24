@@ -81,7 +81,7 @@ class Grid<T>(data: List<List<T>>) {
         neighbours: (GridCell<T>) -> Collection<GridCell<T>> = {
             crossNeighbours(it.position)
         },
-    ) = aStar(start, end, heuristic, neighbours)
+    ) = aStar(start, isEndNode = {it == end}, heuristic, neighbours)
 }
 
 data class Vector2d(var x: Int = 0, var y: Int = 0) {
@@ -139,6 +139,8 @@ data class Vector3d(var x: Int = 0, var y: Int = 0, var z:Int = 0) {
     operator fun plus(vector3d: Vector3d) = Vector3d(x + vector3d.x, y + vector3d.y, z + vector3d.z)
     operator fun minus(vector3d: Vector3d) = Vector3d(x - vector3d.x, y - vector3d.y, z - vector3d.z)
 
+    operator fun times(times:Int) = Vector3d(x * times, y * times, z * times)
+
     fun increment(vector3d: Vector3d):Vector3d{
         this.x += vector3d.x
         this.y += vector3d.y
@@ -168,7 +170,7 @@ class VectorN(val components: MutableList<Int>) {
 
 fun <Node> aStar(
     start: Node,
-    end: Node,
+    isEndNode: (Node) -> Boolean,
     heuristic: (Node) -> Int,
     neighbours: (Node) -> Collection<Node>,
 ): List<Node> {
@@ -192,7 +194,7 @@ fun <Node> aStar(
     while (openSet.isNotEmpty()) {
         val current = openSet.minBy { fScores[it]!! }
 
-        if (current == end)
+        if (isEndNode(current))
             return reconstructPath(cameFrom, current)
 
         openSet.remove(current)

@@ -24,7 +24,7 @@ fun main() {
         fun visitNode(node: Node, minutesLeft: Int, pressureReleased: Int, opened: Set<Node>, closed: Set<Node>, visited: List<Node>): Pair<Int, List<Node>> {
             val dp = opened.sumOf { it.rate }
 
-            val reachableClosed = closed.map { Pair(it, aStar(node, it, { 0 }, { n -> n.paths })) }
+            val reachableClosed = closed.map { Pair(it, aStar(node, {end -> end == it}, { 0 }, { n -> n.paths })) }
                 .filter { (_, steps) -> steps.size <= minutesLeft }
 
             if (reachableClosed.isEmpty() || minutesLeft == 0)
