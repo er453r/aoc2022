@@ -3,42 +3,21 @@ fun main() {
     val neighboursInTime = directions.values.map { it + Vector3d.BACK }.toSet() + Vector3d.BACK
     val start = Vector3d(0, -1, 0)
 
-    fun isEmpty(positionInTime: Vector3d, width:Int, height:Int, initialState:Map<Vector3d, Vector3d?>): Boolean {
-        if(positionInTime.x !in (0 until width) || positionInTime.y !in (0 until height))
-            return false
+    fun isEmpty(positionInTime: Vector3d, width: Int, height: Int, initialState: Map<Vector3d, Vector3d?>, start: Vector3d, end: Vector2d) = when {
+        (positionInTime.x == start.x && positionInTime.y == start.y) || (positionInTime.x == end.x && positionInTime.y == end.y) -> true // start or end is OK
+        positionInTime.x !in (0 until width) || positionInTime.y !in (0 until height) -> false
+        directions.values.map { direction ->
+            Pair((Vector3d(positionInTime.x, positionInTime.y, 0) - direction * positionInTime.z).apply {
+                x = (width + (x % width)) % width
+                y = (height + (y % height)) % height
+            }, direction)
+        }.any { (possibleBlizzard, direction) -> possibleBlizzard in initialState && initialState[possibleBlizzard] == direction } -> false
 
-        val minutes = positionInTime.z
-        val position = Vector3d(positionInTime.x, positionInTime.y, 0)
-
-        for (direction in directions.values) { // we assume position is empty, check if blizzard is approaching
-            val possibleBlizzardPosition = position - direction * minutes
-
-            possibleBlizzardPosition.x = (width + (possibleBlizzardPosition.x % width)) % width
-            possibleBlizzardPosition.y = (height + (possibleBlizzardPosition.y % height)) % height
-
-            if (possibleBlizzardPosition in initialState && initialState[possibleBlizzardPosition] == direction)
-                return false
-        }
-
-        return true
+        else -> true
     }
 
-    fun neighbours(node: Vector3d, start:Vector3d, end:Vector2d, width:Int, height:Int, initialState:Map<Vector3d, Vector3d?>):Set<Vector3d>{
-        if(node.z > 10000) // abandon long paths
-            return emptySet()
-
-        val allNeighbours = neighboursInTime.map { node + it }.toSet()
-        val possibleEnd = allNeighbours.firstOrNull { it.x == end.x && it.y == end.y }
-        val possibleStart = allNeighbours.firstOrNull { it.x == start.x && it.y == start.y }
-        val neighboursInBonds = allNeighbours.filter { isEmpty(it, width, height, initialState) }.toMutableSet()
-
-        if(possibleEnd != null)
-            neighboursInBonds += possibleEnd
-
-        if(possibleStart != null)
-            neighboursInBonds += possibleStart
-
-        return neighboursInBonds
+    fun neighbours(node: Vector3d, start: Vector3d, end: Vector2d, width: Int, height: Int, initialState: Map<Vector3d, Vector3d?>): Set<Vector3d> {
+        return neighboursInTime.map { node + it }.filter { isEmpty(it, width, height, initialState, start, end) }.toSet()
     }
 
     fun part1(input: List<String>): Int {
@@ -55,8 +34,8 @@ fun main() {
             start = start,
             isEndNode = { node -> node.x == end.x && node.y == end.y },
             heuristic = { (end - Vector2d(it.x, it.y)).manhattan() },
-            neighbours = {
-                node -> neighbours(node, start, end, width, height, initialState)
+            neighbours = { node ->
+                neighbours(node, start, end, width, height, initialState)
             })
 
         return path.size - 1
@@ -72,31 +51,28 @@ fun main() {
             Vector3d(it.position.x, it.position.y, 0) - Vector3d(1, 1, 0) to directions[it.value]
         }
 
-
-
-
         val path1 = aStar(
             start = start,
             isEndNode = { node -> node.x == end.x && node.y == end.y },
             heuristic = { (end - Vector2d(it.x, it.y)).manhattan() },
-            neighbours = {
-                    node -> neighbours(node, start, end, width, height, initialState)
+            neighbours = { node ->
+                neighbours(node, start, end, width, height, initialState)
             })
 
         val path2 = aStar(
             start = path1.first(),
             isEndNode = { node -> node.x == 0 && node.y == -1 },
             heuristic = { (end - Vector2d(it.x, it.y)).manhattan() },
-            neighbours = {
-                    node -> neighbours(node, start, end, width, height, initialState)
+            neighbours = { node ->
+                neighbours(node, start, end, width, height, initialState)
             })
 
         val path3 = aStar(
             start = path2.first(),
             isEndNode = { node -> node.x == end.x && node.y == end.y },
             heuristic = { (end - Vector2d(it.x, it.y)).manhattan() },
-            neighbours = {
-                    node -> neighbours(node, start, end, width, height, initialState)
+            neighbours = { node ->
+                neighbours(node, start, end, width, height, initialState)
             })
 
         return path1.size + path2.size + path3.size - 3
