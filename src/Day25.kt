@@ -1,41 +1,22 @@
 fun main() {
-    val digitMap = mapOf('=' to -2, '-' to -1, '0' to 0, '1' to 1, '2' to 2)
+    val charToDigit = mapOf('=' to -2, '-' to -1, '0' to 0, '1' to 1, '2' to 2)
+    val digitToChar = charToDigit.map { (char, digit) -> digit.toLong() to char }.toMap()
 
-    fun toDecimal(snafu: String) = snafu.toCharArray().reversed().mapIndexed { index, char ->  digitMap[char]!! * 5.pow(index) }.sum()
+    fun toDecimal(snafu: String) = snafu.toCharArray().reversed().mapIndexed { index, char -> charToDigit[char]!! * 5.pow(index) }.sum()
 
     fun toSnafu(decimal: Long): String {
-        var maxExponent = 0
+        var value = decimal
+        var result = ""
 
-        while (decimal > toDecimal("2".repeat(maxExponent + 1)))
-            maxExponent++
-
-        var digits = if (decimal > toDecimal("1" + "2".repeat(maxExponent))) "2" else "1"
-
-        digitLoop@while (digits.length < maxExponent + 1) {
-            if(decimal > toDecimal(digits + "1" + "2".repeat(maxExponent - digits.length))) {
-                digits += "2"
-                continue@digitLoop
-            }
-
-            if(decimal > toDecimal(digits + "0" + "2".repeat(maxExponent - digits.length))) {
-                digits += "1"
-                continue@digitLoop
-            }
-
-            if(decimal < toDecimal(digits + "-" + "=".repeat(maxExponent - digits.length))) {
-                digits += "="
-                continue@digitLoop
-            }
-
-            if(decimal < toDecimal(digits + "0" + "=".repeat(maxExponent - digits.length))) {
-                digits += "-"
-                continue@digitLoop
-            }
-
-            digits += "0"
+        while (value > 0) {
+            var digit = value % 5
+            if (digit > 2)
+                digit -= 5
+            value = (value - digit) / 5
+            result += digitToChar[digit]!!
         }
 
-        return digits
+        return result.reversed()
     }
 
     fun part1(input: List<String>) = toSnafu(input.sumOf { toDecimal(it) })
