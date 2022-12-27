@@ -1,4 +1,5 @@
 import java.io.File
+import java.math.BigInteger
 import kotlin.math.abs
 import kotlin.math.max
 
@@ -81,7 +82,7 @@ class Grid<T>(data: List<List<T>>) {
         neighbours: (GridCell<T>) -> Collection<GridCell<T>> = {
             crossNeighbours(it.position)
         },
-    ) = aStar(start, isEndNode = {it == end}, heuristic, neighbours)
+    ) = aStar(start, isEndNode = { it == end }, heuristic, neighbours)
 }
 
 data class Vector2d(var x: Int = 0, var y: Int = 0) {
@@ -96,7 +97,7 @@ data class Vector2d(var x: Int = 0, var y: Int = 0) {
     operator fun plus(vector2d: Vector2d) = Vector2d(x + vector2d.x, y + vector2d.y)
     operator fun minus(vector2d: Vector2d) = Vector2d(x - vector2d.x, y - vector2d.y)
 
-    fun increment(vector2d: Vector2d):Vector2d{
+    fun increment(vector2d: Vector2d): Vector2d {
         this.x += vector2d.x
         this.y += vector2d.y
 
@@ -109,7 +110,7 @@ data class Vector2d(var x: Int = 0, var y: Int = 0) {
 
     fun length() = max(abs(x), abs(y))
 
-    fun manhattan() =  abs(x) + abs(y)
+    fun manhattan() = abs(x) + abs(y)
 
     fun neighbours8() = setOf(
         this + UP,
@@ -123,10 +124,10 @@ data class Vector2d(var x: Int = 0, var y: Int = 0) {
     )
 }
 
-data class Vector3d(var x: Int = 0, var y: Int = 0, var z:Int = 0) {
+data class Vector3d(var x: Int = 0, var y: Int = 0, var z: Int = 0) {
     companion object {
         val UP = Vector3d(0, -1, 0)
-        val DOWN = Vector3d(0, 1 , 0)
+        val DOWN = Vector3d(0, 1, 0)
         val LEFT = Vector3d(-1, 0, 0)
         val RIGHT = Vector3d(1, 0, 0)
         val FORWARD = Vector3d(0, 0, -1)
@@ -139,9 +140,9 @@ data class Vector3d(var x: Int = 0, var y: Int = 0, var z:Int = 0) {
     operator fun plus(vector3d: Vector3d) = Vector3d(x + vector3d.x, y + vector3d.y, z + vector3d.z)
     operator fun minus(vector3d: Vector3d) = Vector3d(x - vector3d.x, y - vector3d.y, z - vector3d.z)
 
-    operator fun times(times:Int) = Vector3d(x * times, y * times, z * times)
+    operator fun times(times: Int) = Vector3d(x * times, y * times, z * times)
 
-    fun increment(vector3d: Vector3d):Vector3d{
+    fun increment(vector3d: Vector3d): Vector3d {
         this.x += vector3d.x
         this.y += vector3d.y
         this.z += vector3d.z
@@ -151,13 +152,13 @@ data class Vector3d(var x: Int = 0, var y: Int = 0, var z:Int = 0) {
 }
 
 class VectorN(val components: MutableList<Int>) {
-    constructor(vararg ints:Int) : this(ints.toMutableList())
+    constructor(vararg ints: Int) : this(ints.toMutableList())
 
     operator fun plus(vectorN: VectorN) = VectorN(components.mapIndexed { index, it -> it + vectorN.components[index] }.toMutableList())
     operator fun minus(vectorN: VectorN) = VectorN(components.mapIndexed { index, it -> it - vectorN.components[index] }.toMutableList())
 
-    fun increment(vectorN: VectorN):VectorN{
-        for(n in components.indices)
+    fun increment(vectorN: VectorN): VectorN {
+        for (n in components.indices)
             components[n] += vectorN.components[n]
 
         return this
@@ -216,21 +217,22 @@ fun <Node> aStar(
     return emptyList()
 }
 
-fun List<String>.separateByBlank():List<List<String>>{
+fun List<String>.separateByBlank(): List<List<String>> {
     val result = mutableListOf<List<String>>()
     var currentList = mutableListOf<String>()
 
-    for(line in this)
-        when{
+    for (line in this)
+        when {
             line.isBlank() && currentList.isEmpty() -> continue
             line.isBlank() -> {
                 result.add(currentList)
                 currentList = mutableListOf()
             }
+
             else -> currentList.add(line)
         }
 
-    if(currentList.isNotEmpty())
+    if (currentList.isNotEmpty())
         result.add(currentList)
 
     return result
@@ -238,7 +240,7 @@ fun List<String>.separateByBlank():List<List<String>>{
 
 fun Int.factorial() = (1L..this).reduce(Long::times)
 
-fun <T> List<T>.findLongestSequence():Pair<Int, Int>{
+fun <T> List<T>.findLongestSequence(): Pair<Int, Int> {
     val sequences = mutableListOf<Pair<Int, Int>>()
 
     for (startPos in indices) {
@@ -262,4 +264,12 @@ fun <T> List<T>.findLongestSequence():Pair<Int, Int>{
 fun gcd(a: Int, b: Int): Int {
     if (b == 0) return a
     return gcd(b, a % b)
+}
+
+fun Long.pow(exp: Int): Long {
+    return BigInteger.valueOf(this).pow(exp).toLong()
+}
+
+fun Int.pow(exp: Int): Long {
+    return BigInteger.valueOf(this.toLong()).pow(exp).toLong()
 }
